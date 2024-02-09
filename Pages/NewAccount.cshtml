@@ -1,0 +1,75 @@
+﻿@page
+@model SecureSoftware.Pages.NewAccountModel
+@{
+}
+
+<h2>New Account</h2>
+<div class="row">
+    <div class="col">
+        <div class="text-danger" asp-validation-summary="All"></div>
+    </div>
+</div>
+<form id="form" method="post" autocomplete="off">
+    <div class="row">
+        <div class="col-6">
+            <div class="form-floating">
+                <input class="form-control" placeholder=" " asp-for="Username" />
+                <label asp-for="Username">Username</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 my-2">
+            <div class="form-floating">
+                <input class="form-control" placeholder=" " asp-for="Password" type="password" />
+                <label asp-for="Password">Password</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="form-floating">
+                <input id="confirmPass" class="form-control" placeholder=" " type="password" />
+                <label for="confirmPass">Confirm Password</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-6">
+            <button id="button" type="submit" class="btn btn-success" disabled>Create Account</button>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div id="error" class="col">
+            
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+
+    <script>
+
+        document.querySelector('#confirmPass').addEventListener('keyup', (e) => {
+            document.querySelector('#error').innerHTML = ''
+
+            let pass1 = document.querySelector('#Password')
+            let pass2 = document.querySelector('#confirmPass')
+
+            if ((pass1.value == pass2.value) && document.querySelector('#Username').value != '') {
+                document.querySelector('#error').innerHTML = '<span class="text-success">Passwords Match</span>'
+                document.querySelector('#button').disabled = false
+            }
+            else {
+                let err = document.createElement('span')
+                err.setAttribute('class', 'text-danger')
+                err.innerHTML = "Passwords do not match"
+                document.querySelector('#error').appendChild(err)
+                document.querySelector('#button').disabled = true
+            }
+                
+        })
+
+    </script>
+
+}
