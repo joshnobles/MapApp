@@ -1,0 +1,97 @@
+﻿@page
+@model SecureSoftware.Pages.MapModel
+@{
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<h1>welcome @Model.CurrentUser!.Username</h1>
+<hr />
+<h4>Click anywhere to add a point!</h4>
+<div id="map" style="width: 500px; height: 500px;">
+
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        map = L.map('map').setView([0, 0], 3)
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map)
+
+        let popup = L.popup()
+
+        map.on('click', (e) => {
+            let content = '<div class="row">'
+            content += '<h5>Save this point?</h5>'
+            content += '<span id="error" class="text-danger"></span>'
+            content += '<div class="form-floating mb-3">'
+            content += '<input id="name" class="form-control" type="text" placeholder=" " />'
+            content += '<label for="name">Name</label>'
+            content += '</div>'
+            content += '<div class="form-floating mb-3">'
+            content += '<input id="desc" class="form-control" type="text" placeholder=" " />'
+            content += '<label for="desc">Description</label>'
+            content += '</div>'
+            content += `<button class="btn btn-success" type="button" onclick="SavePoint(${e.latlng.lat}, ${e.latlng.lng})">Save Point</button>`
+            content += '</div>'
+
+            popup
+                .setLatLng(e.latlng)
+                .setContent(content)
+                .openOn(map);
+        })
+
+        GetPoints()
+
+        async function SavePoint(lat, lng) {
+            map.closePopup()
+
+            let error = document.querySelector('#error')
+            error.innerHTML = ''
+
+            let name = document.querySelector('#name').value.trim()
+            let desc = document.querySelector('#desc').value.trim()
+
+            if (name == '' || desc == '') {
+                error.innerHTML = 'You must include a name and description to add a point'
+                return
+            }
+
+            await fetch(`?handler=SavePoint&lat=${lat}&lng=${lng}&name=${name}&desc=${desc}`)
+                .then(res => res.json())
+                .then(json => {
+                    if (json == 'success')
+                        GetPoints()
+                    else
+                        location.href = 'Index?session=expired'
+                })
+        }
+
+        async function GetPoints() {
+            await fetch('?handler=Points')
+                .then(res => res.json())
+                .then(json => {                   
+                    if (json == 'failure') {
+                        location.href = 'Index?session=expired'
+                        return
+                    }
+
+                    for (p of json) {
+                        let content = `<h5>${p.pointName}</h5>`
+                        content += `<p>${p.pointDesc}</p>`
+
+                        let marker = L.marker([p.lat, p.lng])
+                        marker.bindPopup(content)
+
+                        marker.addTo(map)
+                    }
+                })
+        }
+
+    </script>
+}

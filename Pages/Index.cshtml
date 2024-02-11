@@ -6,7 +6,7 @@
 
 <h2>Login</h2>
 <div class="row">
-    <div class="col">
+    <div id="error" class="col">
         <div class="text-danger" asp-validation-summary="All"></div>
     </div>
 </div>
@@ -40,3 +40,18 @@
         </div>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+
+        if (params.session == 'expired') {
+            let err = document.createElement('span')
+            err.setAttribute('class', 'text-danger')
+            err.innerHTML = 'Your session has expired, please log in again'
+            document.querySelector('#error').appendChild(err)
+        }
+    </script>
+}

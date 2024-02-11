@@ -54,8 +54,9 @@ namespace SecureSoftware.Pages
                 return Page();
             }
 
-            ModelState.AddModelError(string.Empty, "It Worked");
-            return Page();
+            HttpContext.Session.SetInt32("IdUser", user.IdUser);
+
+            return Redirect("/Map");
         }
 
         public IActionResult OnPostNewAccount()

@@ -6,6 +6,9 @@ namespace SecureSoftware.Entities
     [Table("MapPoint")]
     public class MapPoint
     {
+        [Key]
+        public int IdMapPoint { get; set; }
+
         public int IdUser { get; set; }
 
         [StringLength(100)]
@@ -14,8 +17,8 @@ namespace SecureSoftware.Entities
         [StringLength(500)]
         public string PointDesc { get; set; } = null!;
 
-        public float Lat { get; set; }
+        public double Lat { get; set; }
 
-        public float Lng { get; set; }
+        public double Lng { get; set; }
     }
 }

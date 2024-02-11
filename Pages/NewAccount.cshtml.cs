@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using SecureSoftware.DataAccess;
 using SecureSoftware.Entities;
 using System.ComponentModel.DataAnnotations;
@@ -41,14 +42,18 @@ namespace SecureSoftware.Pages
             Username = await Service.EncryptStringAsync(Username);
             Password = await Service.HashAsync(Password);
 
-            await _context.Users.AddAsync(new User()
+            var NewUser = new User()
             {
                 Username = Username,
                 Password = Password
-            });
+            };
+
+            await _context.Users.AddAsync(NewUser);
             await _context.SaveChangesAsync();
 
-            return Redirect("/Index");
+            HttpContext.Session.SetInt32("IdUser", NewUser.IdUser);
+
+            return Redirect("/Map");
         }
 
     }
