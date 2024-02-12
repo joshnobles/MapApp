@@ -56,7 +56,7 @@
             let pass1 = document.querySelector('#Password')
             let pass2 = document.querySelector('#confirmPass')
 
-            if ((pass1.value == pass2.value) && document.querySelector('#Username').value != '') {
+            if (pass1.value == pass2.value) {
                 document.querySelector('#error').innerHTML = '<span class="text-success">Passwords Match</span>'
                 document.querySelector('#button').disabled = false
             }

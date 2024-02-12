@@ -17,8 +17,8 @@ namespace SecureSoftware.Entities
         [StringLength(500)]
         public string PointDesc { get; set; } = null!;
 
-        public double Lat { get; set; }
+        public string Lat { get; set; } = null!;
 
-        public double Lng { get; set; }
+        public string Lng { get; set; } = null!;
     }
 }

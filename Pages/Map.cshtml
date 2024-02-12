@@ -8,7 +8,7 @@
 <h1>welcome @Model.CurrentUser!.Username</h1>
 <hr />
 <h4>Click anywhere to add a point!</h4>
-<div id="map" style="width: 500px; height: 500px;">
+<div id="map" style="width: 800px; height: 500px;">
 
 </div>
 
@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        map = L.map('map').setView([0, 0], 3)
+        map = L.map('map').setView([0, 0], 1)
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -65,10 +65,19 @@
             await fetch(`?handler=SavePoint&lat=${lat}&lng=${lng}&name=${name}&desc=${desc}`)
                 .then(res => res.json())
                 .then(json => {
-                    if (json == 'success')
-                        GetPoints()
-                    else
+                    if (json == 'failure') {
                         location.href = 'Index?session=expired'
+                        return
+                    }
+
+                    let content = `<h5>${name}</h5>`
+                    content += `<p>${desc}</p>`
+                    content += `<button class="btn btn-danger" type="button" onclick="DeletePoint(${json})">Delete</button>`
+
+                    let marker = L.marker([lat, lng])
+                    marker.bindPopup(content)
+
+                    marker.addTo(map)
                 })
         }
 
@@ -84,12 +93,25 @@
                     for (p of json) {
                         let content = `<h5>${p.pointName}</h5>`
                         content += `<p>${p.pointDesc}</p>`
+                        content += `<button class="btn btn-danger" type="button" onclick="DeletePoint(${p.idMapPoint})">Delete</button>`
 
                         let marker = L.marker([p.lat, p.lng])
                         marker.bindPopup(content)
 
                         marker.addTo(map)
                     }
+                })
+        }
+
+        async function DeletePoint(id) {
+            await fetch(`?handler=Delete&IdMapPoint=${id}`)
+                .then(res => res.json())
+                .then(json => {
+                    if (json == 'failure') {
+                        location.href = 'Index?session=expired'
+                        return
+                    }
+                    location.reload()
                 })
         }
 

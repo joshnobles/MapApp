@@ -32,12 +32,15 @@ namespace SecureSoftware.Pages
 
         public void OnGet()
         {
-
+            HttpContext.Session.Remove("IdUser");
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             ModelState.AddModelError(string.Empty, string.Empty);
+
+            if (Username is null || Password is null)
+                return Page();
 
             Username = Username.Trim();
             Password = Password.Trim();

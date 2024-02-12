@@ -18,8 +18,6 @@ namespace SecureSoftware.Pages
 
         public Service Service = new();
 
-        public List<MapPoint>? MapPoints { get; set; }
-
         public async Task<IActionResult> OnGet()
         {
             var IdUser = HttpContext.Session.GetInt32("IdUser");
@@ -34,8 +32,6 @@ namespace SecureSoftware.Pages
 
             CurrentUser.Username = await Service.DecryptStringAsync(CurrentUser.Username);
 
-            MapPoints = await _context.MapPoints.Where(m => m.IdUser == CurrentUser.IdUser).ToListAsync();
-
             return Page();
         }
 
@@ -46,24 +42,24 @@ namespace SecureSoftware.Pages
             if (IdUser is null)
                 return new JsonResult("failure");
 
-            var lat = float.Parse(Request.Query["lat"].ToString());
-            var lng = float.Parse(Request.Query["lng"].ToString());
+            var lat = Request.Query["lat"].ToString();
+            var lng = Request.Query["lng"].ToString();
             var name = Request.Query["name"].ToString();
             var desc = Request.Query["desc"].ToString();
 
             var newPoint = new MapPoint()
             {
                 IdUser = (int)IdUser,
-                PointName = name,
-                PointDesc = desc,
-                Lat = lat,
-                Lng = lng
+                PointName = await Service.EncryptStringAsync(name),
+                PointDesc = await Service.EncryptStringAsync(desc),
+                Lat = await Service.EncryptStringAsync(lat),
+                Lng = await Service.EncryptStringAsync(lng)
             };
 
             await _context.MapPoints.AddAsync(newPoint);
             await _context.SaveChangesAsync();
 
-            return new JsonResult("success");
+            return new JsonResult(newPoint.IdMapPoint);
         }
 
         public async Task<JsonResult> OnGetPoints()
@@ -73,9 +69,37 @@ namespace SecureSoftware.Pages
             if (IdUser is null)
                 return new JsonResult("failure");
 
-            var t = new JsonResult(await _context.MapPoints.Where(m => m.IdUser == IdUser).ToListAsync());
+            var pointList = await _context.MapPoints.Where(m => m.IdUser == IdUser).ToListAsync();
 
-            return new JsonResult(await _context.MapPoints.Where(m => m.IdUser == IdUser).ToListAsync());
+            foreach (var p in pointList)
+            {
+                p.PointName = await Service.DecryptStringAsync(p.PointName);
+                p.PointDesc = await Service.DecryptStringAsync(p.PointDesc);
+                p.Lat = await Service.DecryptStringAsync(p.Lat);
+                p.Lng = await Service.DecryptStringAsync(p.Lng);
+            }
+
+            return new JsonResult(pointList);
+        }
+
+        public async Task<JsonResult> OnGetDelete()
+        {
+            var IdUser = HttpContext.Session.GetInt32("IdUser");
+
+            if (IdUser is null)
+                return new JsonResult("failure");
+
+            var IdMapPoint = Convert.ToInt32(Request.Query["IdMapPoint"]);
+
+            var Point = await _context.MapPoints.FirstOrDefaultAsync(m => m.IdUser == IdUser && m.IdMapPoint == IdMapPoint);
+
+            if (Point is null)
+                return new JsonResult("failure");
+
+            _context.MapPoints.Remove(Point);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(string.Empty);
         }
 
     }
