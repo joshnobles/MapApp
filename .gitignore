@@ -366,3 +366,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Entities/Service.cs
 /appsettings.json
+/Entities/Secret.cs
