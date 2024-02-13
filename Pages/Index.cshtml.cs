@@ -8,6 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace SecureSoftware.Pages
 {
@@ -45,7 +46,9 @@ namespace SecureSoftware.Pages
             Username = Username.Trim();
             Password = Password.Trim();
 
-            Regex.Replace(Username, "<.*?>", string.Empty);
+            // Regex.Replace(Username, "<.*?>", string.Empty);
+            Username = HttpUtility.HtmlEncode(Username);
+
             Username = await Service.EncryptStringAsync(Username);
             Password = await Service.HashAsync(Password);
 

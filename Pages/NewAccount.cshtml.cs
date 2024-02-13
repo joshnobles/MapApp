@@ -5,6 +5,7 @@ using SecureSoftware.DataAccess;
 using SecureSoftware.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace SecureSoftware.Pages
 {
@@ -41,7 +42,9 @@ namespace SecureSoftware.Pages
             Username = Username.Trim();
             Password = Password.Trim();
 
-            Regex.Replace(Username, "<.*?>", string.Empty);
+            // Regex.Replace(Username, "<.*?>", string.Empty);
+            Username = HttpUtility.HtmlEncode(Username);
+
             Username = await Service.EncryptStringAsync(Username);
             Password = await Service.HashAsync(Password);
 
