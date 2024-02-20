@@ -43,11 +43,8 @@ namespace SecureSoftware.Pages
             if (Username is null || Password is null)
                 return Page();
 
-            Username = Username.Trim();
-            Password = Password.Trim();
-
-            // Regex.Replace(Username, "<.*?>", string.Empty);
-            Username = HttpUtility.HtmlEncode(Username);
+            Username = HttpUtility.HtmlEncode(Username.Trim());
+            Password = HttpUtility.HtmlEncode(Password.Trim());
 
             Username = await Service.EncryptStringAsync(Username);
             Password = await Service.HashAsync(Password);

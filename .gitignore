@@ -3,9 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-Secret.cs
-appsettings.json
-
 # User-specific files
 *.rsuser
 *.suo
@@ -364,6 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Entities/Service.cs
 /appsettings.json
 /Entities/Secret.cs
